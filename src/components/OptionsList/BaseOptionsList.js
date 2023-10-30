@@ -1,5 +1,5 @@
 import PropTypes from 'prop-types';
-import React, {forwardRef, memo, useEffect, useRef} from 'react';
+import React, {forwardRef, memo, useEffect, useRef, useImperativeHandle} from 'react';
 import {View} from 'react-native';
 import _ from 'underscore';
 import OptionRow from '@components/OptionRow';
@@ -10,6 +10,7 @@ import usePrevious from '@hooks/usePrevious';
 import styles from '@styles/styles';
 import variables from '@styles/variables';
 import {defaultProps as optionsListDefaultProps, propTypes as optionsListPropTypes} from './optionsListPropTypes';
+import scrollWithAnimationTo from '@libs/ScrollAnimation';
 
 const propTypes = {
     /** Determines whether the keyboard gets dismissed in response to a drag */
@@ -73,6 +74,7 @@ function BaseOptionsList({
     const flattenedData = useRef();
     const previousSections = usePrevious(sections);
     const didLayout = useRef(false);
+    const listRef = useRef(null);
 
     /**
      * This helper function is used to memoize the computation needed for getItemLayout. It is run whenever section data changes.
@@ -242,6 +244,35 @@ function BaseOptionsList({
         return <View />;
     };
 
+    useImperativeHandle(innerRef, () => ({
+        scrollToLocation({sectionIndex, itemIndex, animated}) {
+            if (!listRef.current) {
+                return;
+            }
+
+            if (!animated) {
+                listRef.current.scrollToLocation({sectionIndex, itemIndex, animated});
+            } else {
+                let flatDataArrayIndex = 0;
+                for (let idx = 0; idx < sectionIndex; idx ++) {
+                    if (sections[idx].data.length === 0) {
+                        sectionIndex ++;
+                    } else {
+                        flatDataArrayIndex += sections[idx].data.length;
+                    }
+                }
+
+                flatDataArrayIndex += itemIndex;
+                if (!_.has(flattenedData.current, flatDataArrayIndex)) {
+                    flattenedData.current = buildFlatSectionArray();
+                }
+        
+                const scrollPosition = flattenedData.current[flatDataArrayIndex].offset;
+                scrollWithAnimationTo(listRef.current, scrollPosition);
+            }
+        }
+    }), []);
+
     return (
         <View style={listContainerStyles}>
             {isLoading ? (
@@ -256,7 +287,7 @@ function BaseOptionsList({
                         </View>
                     ) : null}
                     <SectionList
-                        ref={innerRef}
+                        ref={listRef}
                         style={listStyles}
                         indicatorStyle="white"
                         keyboardShouldPersistTaps="always"

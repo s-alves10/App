@@ -1,5 +1,6 @@
 import PropTypes from 'prop-types';
 import {Component} from 'react';
+import {debounce} from 'lodash';
 import KeyboardShortcut from '@libs/KeyboardShortcut';
 import CONST from '@src/CONST';
 
@@ -37,8 +38,10 @@ class ArrowKeyFocusManager extends Component {
         const arrowUpConfig = CONST.KEYBOARD_SHORTCUTS.ARROW_UP;
         const arrowDownConfig = CONST.KEYBOARD_SHORTCUTS.ARROW_DOWN;
 
-        this.onArrowUpKey = this.onArrowUpKey.bind(this);
-        this.onArrowDownKey = this.onArrowDownKey.bind(this);
+        // this.onArrowUpKey = this.onArrowUpKey.bind(this);
+        // this.onArrowDownKey = this.onArrowDownKey.bind(this);
+        this.onArrowUpKey = debounce(this.onArrowUpKey, 10).bind(this);
+        this.onArrowDownKey = debounce(this.onArrowDownKey, 10).bind(this);
 
         this.unsubscribeArrowUpKey = KeyboardShortcut.subscribe(arrowUpConfig.shortcutKey, this.onArrowUpKey, arrowUpConfig.descriptionKey, arrowUpConfig.modifiers, true, false, 0, true, [
             this.props.shouldExcludeTextAreaNodes && 'TEXTAREA',
