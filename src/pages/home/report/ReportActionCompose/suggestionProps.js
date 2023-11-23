@@ -27,6 +27,8 @@ const baseProps = {
 
     /** Report composer focus state */
     isComposerFocused: PropTypes.bool,
+
+    onClose: PropTypes.func,
 };
 
 const implementationBaseProps = {

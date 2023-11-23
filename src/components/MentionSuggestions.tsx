@@ -31,6 +31,9 @@ type MentionSuggestionsProps = {
     /** Fired when the user selects an mention */
     onSelect: () => void;
 
+    /** Fired when the user tap outside the suggestion list */
+    onClose: () => void;
+
     /** Mention prefix that follows the @ sign  */
     prefix: string;
 
@@ -48,7 +51,7 @@ type MentionSuggestionsProps = {
  */
 const keyExtractor = (item: Mention) => item.alternateText;
 
-function MentionSuggestions({prefix, mentions, highlightedMentionIndex = 0, onSelect, isMentionPickerLarge, measureParentContainer = () => {}}: MentionSuggestionsProps) {
+function MentionSuggestions({prefix, mentions, highlightedMentionIndex = 0, onSelect, onClose, isMentionPickerLarge, measureParentContainer = () => {}}: MentionSuggestionsProps) {
     const theme = useTheme();
     const styles = useThemeStyles();
     /**
@@ -108,6 +111,7 @@ function MentionSuggestions({prefix, mentions, highlightedMentionIndex = 0, onSe
 
     return (
         <AutoCompleteSuggestions
+            onClose={onClose}
             suggestions={mentions}
             renderSuggestionMenuItem={renderSuggestionMenuItem}
             keyExtractor={keyExtractor}

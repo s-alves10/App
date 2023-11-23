@@ -42,6 +42,7 @@ function Suggestions({
     measureParentContainer,
     isAutoSuggestionPickerLarge,
     isComposerFocused,
+    onClose,
 }) {
     const suggestionEmojiRef = useRef(null);
     const suggestionMentionRef = useRef(null);
@@ -122,6 +123,7 @@ function Suggestions({
         isAutoSuggestionPickerLarge,
         measureParentContainer,
         isComposerFocused,
+        onClose,
     };
 
     return (

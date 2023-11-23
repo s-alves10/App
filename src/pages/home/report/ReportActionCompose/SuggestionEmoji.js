@@ -60,6 +60,7 @@ function SuggestionEmoji({
     resetKeyboardInput,
     measureParentContainer,
     isComposerFocused,
+    onClose,
 }) {
     const [suggestionValues, setSuggestionValues] = useState(defaultSuggestionsValues);
 
@@ -232,7 +233,7 @@ function SuggestionEmoji({
 
     return (
         <EmojiSuggestions
-            onClose={resetEmojiSuggestions}
+            onClose={onClose}
             highlightedEmojiIndex={highlightedEmojiIndex}
             emojis={suggestionValues.suggestedEmojis}
             comment={value}

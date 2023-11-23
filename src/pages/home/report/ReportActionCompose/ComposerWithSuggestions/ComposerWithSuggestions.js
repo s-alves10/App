@@ -591,6 +591,7 @@ function ComposerWithSuggestions({
                 selection={selection}
                 setSelection={setSelection}
                 resetKeyboardInput={resetKeyboardInput}
+                onClose={blur}
             />
 
             <SilentCommentUpdater

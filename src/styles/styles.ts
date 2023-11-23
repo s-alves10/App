@@ -245,6 +245,12 @@ const styles = (theme: ThemeColors) =>
             paddingVertical: CONST.AUTO_COMPLETE_SUGGESTER.SUGGESTER_INNER_PADDING,
         },
 
+        autoCompleteOutsideContainer: {
+            left: -20,
+            right: -20,
+            position: 'absolute',
+        },
+
         autoCompleteSuggestionContainer: {
             flexDirection: 'row',
             alignItems: 'center',

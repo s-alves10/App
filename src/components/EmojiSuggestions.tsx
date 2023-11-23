@@ -20,6 +20,9 @@ type EmojiSuggestionsProps = {
     /** Fired when the user selects an emoji */
     onSelect: (index: number) => void;
 
+    /** Fired when the user tap outside the suggestion list */
+    onClose: () => void;
+
     /** Emoji prefix that follows the colon */
     prefix: string;
 
@@ -41,7 +44,7 @@ type EmojiSuggestionsProps = {
  */
 const keyExtractor = (item: SimpleEmoji, index: number): string => `${item.name}+${index}}`;
 
-function EmojiSuggestions({emojis, onSelect, prefix, isEmojiPickerLarge, preferredSkinToneIndex, highlightedEmojiIndex = 0, measureParentContainer = () => {}}: EmojiSuggestionsProps) {
+function EmojiSuggestions({emojis, onSelect, onClose, prefix, isEmojiPickerLarge, preferredSkinToneIndex, highlightedEmojiIndex = 0, measureParentContainer = () => {}}: EmojiSuggestionsProps) {
     const styles = useThemeStyles();
     /**
      * Render an emoji suggestion menu item component.
@@ -78,6 +81,7 @@ function EmojiSuggestions({emojis, onSelect, prefix, isEmojiPickerLarge, preferr
             keyExtractor={keyExtractor}
             highlightedSuggestionIndex={highlightedEmojiIndex}
             onSelect={onSelect}
+            onClose={onClose}
             isSuggestionPickerLarge={isEmojiPickerLarge}
             accessibilityLabelExtractor={keyExtractor}
             measureParentContainer={measureParentContainer}

@@ -49,6 +49,7 @@ function SuggestionMention({
     isAutoSuggestionPickerLarge,
     measureParentContainer,
     isComposerFocused,
+    onClose,
 }) {
     const personalDetails = usePersonalDetails() || CONST.EMPTY_OBJECT;
     const {translate} = useLocalize();
@@ -255,10 +256,6 @@ function SuggestionMention({
         },
         [shouldBlockCalc],
     );
-
-    const onClose = useCallback(() => {
-        setSuggestionValues((prevState) => ({...prevState, suggestedMentions: []}));
-    }, []);
 
     const getSuggestions = useCallback(() => suggestionValues.suggestedMentions, [suggestionValues]);
 
