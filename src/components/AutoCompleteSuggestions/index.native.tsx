@@ -1,12 +1,12 @@
 import {Portal} from '@gorhom/portal';
 import React from 'react';
-import BaseAutoCompleteSuggestions from './BaseAutoCompleteSuggestions';
 import useWindowDimensions from '@hooks/useWindowDimensions';
 import { PressableWithoutFeedback } from '@components/Pressable';
 import useThemeStyles from '@styles/useThemeStyles';
+import BaseAutoCompleteSuggestions from './BaseAutoCompleteSuggestions';
 import type {AutoCompleteSuggestionsProps} from './types';
 
-function AutoCompleteSuggestions<TSuggestion>({measureParentContainer, onClose, ...props}: AutoCompleteSuggestionsProps<TSuggestion>) {
+function AutoCompleteSuggestions<TSuggestion>({measureParentContainer, ...props}: AutoCompleteSuggestionsProps<TSuggestion>) {
     const {windowHeight} = useWindowDimensions();
     const styles = useThemeStyles();
     return (
@@ -15,7 +15,7 @@ function AutoCompleteSuggestions<TSuggestion>({measureParentContainer, onClose, 
                 <PressableWithoutFeedback
                     accessible={false}
                     style={[styles.autoCompleteOutsideContainer, {top: -windowHeight, height: windowHeight}]}
-                    onPress={onClose}
+                    onPress={props.onClose}
                 />
             )}
             {/* eslint-disable-next-line react/jsx-props-no-spreading */}

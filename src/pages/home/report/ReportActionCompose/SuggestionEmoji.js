@@ -210,10 +210,6 @@ function SuggestionEmoji({
 
     const getSuggestions = useCallback(() => suggestionValues.suggestedEmojis, [suggestionValues]);
 
-    const resetEmojiSuggestions = useCallback(() => {
-        setSuggestionValues((prevState) => ({...prevState, suggestedEmojis: []}));
-    }, []);
-
     useImperativeHandle(
         forwardedRef,
         () => ({

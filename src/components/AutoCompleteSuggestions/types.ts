@@ -1,4 +1,5 @@
 import {ReactElement} from 'react';
+import PressableProps from '@components/Pressable/GenericPressable/types';
 
 type MeasureParentContainerCallback = (x: number, y: number, width: number) => void;
 
@@ -22,6 +23,8 @@ type AutoCompleteSuggestionsProps<TSuggestion> = {
 
     /** Fired when the user selects a suggestion */
     onSelect: (index: number) => void;
+
+    onClose: PressableProps['onPress'];
 
     /** Show that we can use large auto-complete suggestion picker.
      * Depending on available space and whether the input is expanded, we can have a small or large mention suggester.
