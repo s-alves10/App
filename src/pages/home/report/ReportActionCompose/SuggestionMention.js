@@ -52,7 +52,7 @@ function SuggestionMention({
     onClose,
 }) {
     const personalDetails = usePersonalDetails() || CONST.EMPTY_OBJECT;
-    const {translate} = useLocalize();
+    const {translate, formatPhoneNumber} = useLocalize();
     const previousValue = usePrevious(value);
     const [suggestionValues, setSuggestionValues] = useState(defaultSuggestionsValues);
 
@@ -75,7 +75,7 @@ function SuggestionMention({
         (highlightedMentionIndexInner) => {
             const commentBeforeAtSign = value.slice(0, suggestionValues.atSignIndex);
             const mentionObject = suggestionValues.suggestedMentions[highlightedMentionIndexInner];
-            const mentionCode = mentionObject.text === CONST.AUTO_COMPLETE_SUGGESTER.HERE_TEXT ? CONST.AUTO_COMPLETE_SUGGESTER.HERE_TEXT : `@${mentionObject.alternateText}`;
+            const mentionCode = mentionObject.text === CONST.AUTO_COMPLETE_SUGGESTER.HERE_TEXT ? CONST.AUTO_COMPLETE_SUGGESTER.HERE_TEXT : `@${mentionObject.login}`;
             const commentAfterMention = value.slice(suggestionValues.atSignIndex + suggestionValues.mentionPrefix.length + 1);
 
             updateComment(`${commentBeforeAtSign}${mentionCode} ${SuggestionsUtils.trimLeadingSpace(commentAfterMention)}`, true);
@@ -150,7 +150,8 @@ function SuggestionMention({
                 if (!detail.login || detail.isOptimisticPersonalDetail) {
                     return false;
                 }
-                if (searchValue && !`${detail.displayName} ${detail.login}`.toLowerCase().includes(searchValue.toLowerCase())) {
+                const displayText = detail.displayName === formatPhoneNumber(detail.login) ? detail.displayName : `${detail.displayName} ${detail.login}`;
+                if (searchValue && !displayText.toLowerCase().includes(searchValue.toLowerCase())) {
                     return false;
                 }
                 return true;
@@ -160,7 +161,8 @@ function SuggestionMention({
             _.each(_.first(sortedPersonalDetails, CONST.AUTO_COMPLETE_SUGGESTER.MAX_AMOUNT_OF_SUGGESTIONS - suggestions.length), (detail) => {
                 suggestions.push({
                     text: detail.displayName,
-                    alternateText: detail.login,
+                    alternateText: formatPhoneNumber(detail.login),
+                    login: detail.login,
                     icons: [
                         {
                             name: detail.login,
@@ -174,7 +176,7 @@ function SuggestionMention({
 
             return suggestions;
         },
-        [translate],
+        [translate, formatPhoneNumber],
     );
 
     const calculateMentionSuggestion = useCallback(
@@ -199,13 +201,26 @@ function SuggestionMention({
             const leftString = value.substring(0, suggestionEndIndex);
             const words = leftString.split(CONST.REGEX.SPACE_OR_EMOJI);
             const lastWord = _.last(words);
+            const secondToLastWord = words[words.length - 3];
 
             let atSignIndex;
+            let suggestionWord;
+            let prefix;
+
+            // Detect if the last two words contain a mention (two words are needed to detect a mention with a space in it)
             if (lastWord.startsWith('@')) {
                 atSignIndex = leftString.lastIndexOf(lastWord);
-            }
+                suggestionWord = lastWord;
 
-            const prefix = lastWord.substring(1);
+                prefix = suggestionWord.substring(1);
+            } else if (secondToLastWord && secondToLastWord.startsWith('@') && secondToLastWord.length > 1) {
+                atSignIndex = leftString.lastIndexOf(secondToLastWord);
+                suggestionWord = `${secondToLastWord} ${lastWord}`;
+
+                prefix = suggestionWord.substring(1);
+            } else {
+                prefix = lastWord.substring(1);
+            }
 
             const nextState = {
                 suggestedMentions: [],
@@ -213,10 +228,11 @@ function SuggestionMention({
                 mentionPrefix: prefix,
             };
 
-            const isCursorBeforeTheMention = valueAfterTheCursor.startsWith(lastWord);
+            const isCursorBeforeTheMention = valueAfterTheCursor.startsWith(suggestionWord);
 
-            if (!isCursorBeforeTheMention && isMentionCode(lastWord)) {
+            if (!isCursorBeforeTheMention && isMentionCode(suggestionWord)) {
                 const suggestions = getMentionOptions(personalDetails, prefix);
+
                 nextState.suggestedMentions = suggestions;
                 nextState.shouldShowSuggestionMenu = !_.isEmpty(suggestions);
             }
