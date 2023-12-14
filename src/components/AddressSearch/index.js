@@ -10,13 +10,13 @@ import networkPropTypes from '@components/networkPropTypes';
 import {withNetwork} from '@components/OnyxProvider';
 import TextInput from '@components/TextInput';
 import withLocalize, {withLocalizePropTypes} from '@components/withLocalize';
+import useStyleUtils from '@hooks/useStyleUtils';
+import useTheme from '@hooks/useTheme';
+import useThemeStyles from '@hooks/useThemeStyles';
 import * as ApiUtils from '@libs/ApiUtils';
 import compose from '@libs/compose';
 import getCurrentPosition from '@libs/getCurrentPosition';
 import * as GooglePlacesUtils from '@libs/GooglePlacesUtils';
-import styles from '@styles/styles';
-import * as StyleUtils from '@styles/StyleUtils';
-import themeColors from '@styles/themes/default';
 import variables from '@styles/variables';
 import CONST from '@src/CONST';
 import CurrentLocationButton from './CurrentLocationButton';
@@ -163,6 +163,9 @@ function AddressSearch({
     translate,
     value,
 }) {
+    const theme = useTheme();
+    const styles = useThemeStyles();
+    const StyleUtils = useStyleUtils();
     const [displayListViewBorder, setDisplayListViewBorder] = useState(false);
     const [isTyping, setIsTyping] = useState(false);
     const [isFocused, setIsFocused] = useState(false);
@@ -248,6 +251,7 @@ function AddressSearch({
             street2: subpremise,
             // Make sure country is updated first, since city and state will be reset if the country changes
             country: '',
+            state: state || stateAutoCompleteFallback,
             // When locality is not returned, many countries return the city as postalTown (e.g. 5 New Street
             // Square, London), otherwise as sublocality (e.g. 384 Court Street Brooklyn). If postalTown is
             // returned, the sublocality will be a city subdivision so shouldn't take precedence (e.g.
@@ -255,7 +259,6 @@ function AddressSearch({
             city: locality || postalTown || sublocality || cityAutocompleteFallback,
             zipCode,
 
-            state: state || stateAutoCompleteFallback,
             lat: lodashGet(details, 'geometry.location.lat', 0),
             lng: lodashGet(details, 'geometry.location.lng', 0),
             address: lodashGet(details, 'formatted_address', ''),
@@ -271,6 +274,17 @@ function AddressSearch({
         // So we use a secondary field (administrative_area_level_2) as a fallback
         if (country === CONST.COUNTRY.GB) {
             values.state = stateFallback;
+        }
+
+        // Some edge-case addresses may lack both street_number and route in the API response, resulting in an empty "values.street"
+        // We are setting up a fallback to ensure "values.street" is populated with a relevant value
+        if (!values.street && details.adr_address) {
+            const streetAddressRegex = /<span class="street-address">([^<]*)<\/span>/;
+            const adr_address = details.adr_address.match(streetAddressRegex);
+            const streetAddressFallback = lodashGet(adr_address, [1], null);
+            if (streetAddressFallback) {
+                values.street = streetAddressFallback;
+            }
         }
 
         // Not all pages define the Address Line 2 field, so in that case we append any additional address details
@@ -370,19 +384,19 @@ function AddressSearch({
             network.isOffline || !isTyping ? null : (
                 <Text style={[styles.textLabel, styles.colorMuted, styles.pv4, styles.ph3, styles.overflowAuto]}>{translate('common.noResultsFound')}</Text>
             ),
-        [isTyping, translate, network.isOffline],
+        [network.isOffline, isTyping, styles, translate],
     );
 
     const listLoader = useCallback(
         () => (
             <View style={[styles.pv4]}>
                 <ActivityIndicator
-                    color={themeColors.spinner}
+                    color={theme.spinner}
                     size="small"
                 />
             </View>
         ),
-        [],
+        [styles.pv4, theme.spinner],
     );
 
     return (
@@ -492,6 +506,7 @@ function AddressSearch({
                             },
                             maxLength: maxInputLength,
                             spellCheck: false,
+                            selectTextOnFocus: true,
                         }}
                         styles={{
                             textInputContainer: [styles.flexColumn],
@@ -502,8 +517,8 @@ function AddressSearch({
                         }}
                         numberOfLines={2}
                         isRowScrollable={false}
-                        listHoverColor={themeColors.border}
-                        listUnderlayColor={themeColors.buttonPressedBG}
+                        listHoverColor={theme.border}
+                        listUnderlayColor={theme.buttonPressedBG}
                         onLayout={(event) => {
                             // We use the height of the element to determine if we should hide the border of the listView dropdown
                             // to prevent a lingering border when there are no address suggestions.

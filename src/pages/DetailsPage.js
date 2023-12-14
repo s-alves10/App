@@ -20,10 +20,10 @@ import ScreenWrapper from '@components/ScreenWrapper';
 import Text from '@components/Text';
 import UserDetailsTooltip from '@components/UserDetailsTooltip';
 import withLocalize, {withLocalizePropTypes} from '@components/withLocalize';
+import useThemeStyles from '@hooks/useThemeStyles';
 import compose from '@libs/compose';
 import * as ReportUtils from '@libs/ReportUtils';
 import * as UserUtils from '@libs/UserUtils';
-import styles from '@styles/styles';
 import * as Report from '@userActions/Report';
 import CONST from '@src/CONST';
 import ONYXKEYS from '@src/ONYXKEYS';
@@ -85,6 +85,7 @@ const getPhoneNumber = (details) => {
 };
 
 function DetailsPage(props) {
+    const styles = useThemeStyles();
     const login = lodashGet(props.route.params, 'login', '');
     let details = _.find(props.personalDetails, (detail) => detail.login === login.toLowerCase());
 
@@ -126,10 +127,7 @@ function DetailsPage(props) {
         <ScreenWrapper testID={DetailsPage.displayName}>
             <FullPageNotFoundView shouldShow={_.isEmpty(login)}>
                 <HeaderWithBackButton title={props.translate('common.details')} />
-                <View
-                    pointerEvents="box-none"
-                    style={[styles.containerWithSpaceBetween]}
-                >
+                <View style={[styles.containerWithSpaceBetween, styles.pointerEventsBoxNone]}>
                     {details ? (
                         <ScrollView>
                             <View style={styles.avatarSectionWrapper}>

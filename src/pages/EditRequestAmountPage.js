@@ -4,6 +4,7 @@ import React, {useCallback, useRef} from 'react';
 import HeaderWithBackButton from '@components/HeaderWithBackButton';
 import ScreenWrapper from '@components/ScreenWrapper';
 import useLocalize from '@hooks/useLocalize';
+import * as DeviceCapabilities from '@libs/DeviceCapabilities';
 import CONST from '@src/CONST';
 import MoneyRequestAmountForm from './iou/steps/MoneyRequestAmountForm';
 
@@ -42,12 +43,13 @@ function EditRequestAmountPage({defaultAmount, defaultCurrency, onNavigateToCurr
     return (
         <ScreenWrapper
             includeSafeAreaPaddingBottom={false}
-            shouldEnableMaxHeight
+            shouldEnableKeyboardAvoidingView={false}
+            shouldEnableMinHeight={DeviceCapabilities.canUseTouchScreen()}
             testID={EditRequestAmountPage.displayName}
         >
             <HeaderWithBackButton title={translate('iou.amount')} />
             <MoneyRequestAmountForm
-                isEditing
+                buttonTranslationText="common.save"
                 currency={defaultCurrency}
                 amount={defaultAmount}
                 ref={(e) => (textInput.current = e)}

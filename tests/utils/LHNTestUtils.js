@@ -130,6 +130,7 @@ function getFakeReportAction(actor = 'email1@test.com', millisecondsInThePast = 
         actor,
         actorAccountID: 1,
         reportActionID: `${++lastFakeReportActionID}`,
+        actionName: CONST.REPORT.ACTIONS.TYPE.CREATED,
         shouldShow: true,
         timestamp,
         reportActionTimestamp: timestamp,
@@ -142,13 +143,59 @@ function getFakeReportAction(actor = 'email1@test.com', millisecondsInThePast = 
         ],
         whisperedToAccountIDs: [],
         automatic: false,
+        message: [
+            {
+                type: 'COMMENT',
+                html: 'hey',
+                text: 'hey',
+                isEdited: false,
+                whisperedTo: [],
+                isDeletedParentAction: false,
+                reactions: [
+                    {
+                        emoji: 'heart',
+                        users: [
+                            {
+                                accountID: 1,
+                                skinTone: -1,
+                            },
+                        ],
+                    },
+                ],
+            },
+        ],
+        originalMessage: {
+            childReportID: `${++lastFakeReportActionID}`,
+            emojiReactions: {
+                heart: {
+                    createdAt: '2023-08-28 15:27:52',
+                    users: {
+                        1: {
+                            skinTones: {
+                                '-1': '2023-08-28 15:27:52',
+                            },
+                        },
+                    },
+                },
+            },
+            html: 'hey',
+            lastModified: '2023-08-28 15:28:12.432',
+            reactions: [
+                {
+                    emoji: 'heart',
+                    users: [
+                        {
+                            accountID: 1,
+                            skinTone: -1,
+                        },
+                    ],
+                },
+            ],
+        },
     };
 }
 
 /**
- * There is one setting not represented here, which is hasOutstandingIOU. In order to test that setting, there must be
- * additional reports in Onyx, so it's being left out for now.
- *
  * @param {boolean} isArchived
  * @param {boolean} isUserCreatedPolicyRoom
  * @param {boolean} hasAddWorkspaceError
@@ -256,6 +303,7 @@ function MockedSidebarLinks({currentReportID}) {
     return (
         <ComposeProviders components={[OnyxProvider, LocaleContextProvider, EnvironmentProvider, CurrentReportIDContextProvider]}>
             <SidebarLinksData
+                onLinkClick={() => {}}
                 insets={{
                     top: 0,
                     left: 0,
@@ -264,7 +312,6 @@ function MockedSidebarLinks({currentReportID}) {
                 }}
                 isSmallScreenWidth={false}
                 currentReportID={currentReportID}
-                onLinkClick={() => {}}
             />
         </ComposeProviders>
     );

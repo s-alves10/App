@@ -8,8 +8,8 @@ import PressableWithoutFeedback from '@components/Pressable/PressableWithoutFeed
 import SafeAreaConsumer from '@components/SafeAreaConsumer';
 import Text from '@components/Text';
 import useLocalize from '@hooks/useLocalize';
+import useThemeStyles from '@hooks/useThemeStyles';
 import ReportAttachmentsContext from '@pages/home/report/ReportAttachmentsContext';
-import styles from '@styles/styles';
 import CONST from '@src/CONST';
 
 const propTypes = {
@@ -27,8 +27,8 @@ const propTypes = {
         /** Additional information about the attachment file */
         file: PropTypes.shape({
             /** File name of the attachment */
-            name: PropTypes.string,
-        }),
+            name: PropTypes.string.isRequired,
+        }).isRequired,
 
         /** Whether the attachment has been flagged */
         hasBeenFlagged: PropTypes.bool,
@@ -49,6 +49,7 @@ const defaultProps = {
 };
 
 function CarouselItem({item, isFocused, onPress}) {
+    const styles = useThemeStyles();
     const {translate} = useLocalize();
     const {isAttachmentHidden} = useContext(ReportAttachmentsContext);
     // eslint-disable-next-line es/no-nullish-coalescing-operators
@@ -61,8 +62,7 @@ function CarouselItem({item, isFocused, onPress}) {
             onPress={() => setIsHidden(!isHidden)}
         >
             <Text
-                style={styles.buttonSmallText}
-                selectable={false}
+                style={[styles.buttonSmallText, styles.userSelectNone]}
                 dataSet={{[CONST.SELECTION_SCRAPER_HIDDEN_ELEMENT]: true}}
             >
                 {isHidden ? translate('moderation.revealMessage') : translate('moderation.hideMessage')}
@@ -116,5 +116,6 @@ function CarouselItem({item, isFocused, onPress}) {
 
 CarouselItem.propTypes = propTypes;
 CarouselItem.defaultProps = defaultProps;
+CarouselItem.displayName = 'CarouselItem';
 
 export default CarouselItem;

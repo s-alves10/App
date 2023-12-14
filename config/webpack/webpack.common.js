@@ -13,7 +13,7 @@ const includeModules = [
     'react-native-animatable',
     'react-native-reanimated',
     'react-native-picker-select',
-    '@expensify/react-native-web',
+    'react-native-web',
     'react-native-webview',
     '@react-native-picker',
     'react-native-modal',
@@ -66,7 +66,8 @@ const webpackConfig = ({envFile = '.env', platform = 'web'}) => ({
             template: 'web/index.html',
             filename: 'index.html',
             splashLogo: fs.readFileSync(path.resolve(__dirname, `../../assets/images/new-expensify${mapEnvToLogoSuffix(envFile)}.svg`), 'utf-8'),
-            usePolyfillIO: platform === 'web',
+            isWeb: platform === 'web',
+            isProduction: envFile === '.env.production',
             isStaging: envFile === '.env.staging',
         }),
         new FontPreloadPlugin({
@@ -180,14 +181,16 @@ const webpackConfig = ({envFile = '.env', platform = 'web'}) => ({
                 resourceQuery: /raw/,
                 type: 'asset/source',
             },
+            {
+                test: /\.lottie$/,
+                type: 'asset/resource',
+            },
         ],
     },
     resolve: {
         alias: {
             'react-native-config': 'react-web-config',
-            'react-native$': '@expensify/react-native-web',
-            'react-native-web': '@expensify/react-native-web',
-            'lottie-react-native': 'react-native-web-lottie',
+            'react-native$': 'react-native-web',
 
             // Module alias for web & desktop
             // https://webpack.js.org/configuration/resolve/#resolvealias
@@ -208,7 +211,21 @@ const webpackConfig = ({envFile = '.env', platform = 'web'}) => ({
         // This is also why we have to use .website.js for our own web-specific files...
         // Because desktop also relies on "web-specific" module implementations
         // This also skips packing web only dependencies to desktop and vice versa
-        extensions: ['.web.js', platform === 'web' ? '.website.js' : '.desktop.js', '.js', '.jsx', '.web.ts', platform === 'web' ? '.website.ts' : '.desktop.ts', '.ts', '.web.tsx', '.tsx'],
+        extensions: [
+            '.web.js',
+            ...(platform === 'desktop' ? ['.desktop.js'] : []),
+            '.website.js',
+            '.js',
+            '.jsx',
+            '.web.ts',
+            ...(platform === 'desktop' ? ['.desktop.ts'] : []),
+            '.website.ts',
+            ...(platform === 'desktop' ? ['.desktop.tsx'] : []),
+            '.website.tsx',
+            '.ts',
+            '.web.tsx',
+            '.tsx',
+        ],
         fallback: {
             'process/browser': require.resolve('process/browser'),
         },

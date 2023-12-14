@@ -5,9 +5,9 @@ import * as Expensicons from '@components/Icon/Expensicons';
 import PressableWithoutFeedback from '@components/Pressable/PressableWithoutFeedback';
 import Tooltip from '@components/Tooltip/PopoverAnchorTooltip';
 import withLocalize, {withLocalizePropTypes} from '@components/withLocalize';
+import useStyleUtils from '@hooks/useStyleUtils';
+import useThemeStyles from '@hooks/useThemeStyles';
 import getButtonState from '@libs/getButtonState';
-import styles from '@styles/styles';
-import * as StyleUtils from '@styles/StyleUtils';
 import * as EmojiPickerAction from '@userActions/EmojiPickerAction';
 
 const propTypes = {
@@ -15,7 +15,7 @@ const propTypes = {
     isDisabled: PropTypes.bool,
 
     /** Id to use for the emoji picker button */
-    nativeID: PropTypes.string,
+    id: PropTypes.string,
 
     /** Unique id for emoji picker */
     emojiPickerID: PropTypes.string,
@@ -25,11 +25,13 @@ const propTypes = {
 
 const defaultProps = {
     isDisabled: false,
-    nativeID: '',
+    id: '',
     emojiPickerID: '',
 };
 
 function EmojiPickerButton(props) {
+    const styles = useThemeStyles();
+    const StyleUtils = useStyleUtils();
     const emojiPopoverAnchor = useRef(null);
 
     useEffect(() => EmojiPickerAction.resetEmojiPopoverAnchor, []);
@@ -47,7 +49,7 @@ function EmojiPickerButton(props) {
                         EmojiPickerAction.emojiPickerRef.current.hideEmojiPicker();
                     }
                 }}
-                nativeID={props.nativeID}
+                id={props.id}
                 accessibilityLabel={props.translate('reportActionCompose.emoji')}
             >
                 {({hovered, pressed}) => (

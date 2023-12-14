@@ -3,8 +3,8 @@ import AttachmentCarouselPage from '@components/Attachments/AttachmentCarousel/P
 import ImageView from '@components/ImageView';
 import PressableWithoutFeedback from '@components/Pressable/PressableWithoutFeedback';
 import withLocalize, {withLocalizePropTypes} from '@components/withLocalize';
+import useThemeStyles from '@hooks/useThemeStyles';
 import compose from '@libs/compose';
-import styles from '@styles/styles';
 import CONST from '@src/CONST';
 import {attachmentViewImageDefaultProps, attachmentViewImagePropTypes} from './propTypes';
 
@@ -14,6 +14,7 @@ const propTypes = {
 };
 
 function AttachmentViewImage({source, file, isAuthTokenRequired, isFocused, isUsedInCarousel, loadComplete, onPress, isImage, onScaleChanged, translate}) {
+    const styles = useThemeStyles();
     const children = isUsedInCarousel ? (
         <AttachmentCarouselPage
             source={source}
@@ -47,5 +48,6 @@ function AttachmentViewImage({source, file, isAuthTokenRequired, isFocused, isUs
 
 AttachmentViewImage.propTypes = propTypes;
 AttachmentViewImage.defaultProps = attachmentViewImageDefaultProps;
+AttachmentViewImage.displayName = 'AttachmentViewImage';
 
 export default compose(memo, withLocalize)(AttachmentViewImage);

@@ -3,8 +3,8 @@ import React, {memo} from 'react';
 import {withCurrentDate} from '@components/OnyxProvider';
 import Text from '@components/Text';
 import withLocalize, {withLocalizePropTypes} from '@components/withLocalize';
+import useThemeStyles from '@hooks/useThemeStyles';
 import compose from '@libs/compose';
-import styles from '@styles/styles';
 
 const propTypes = {
     /** UTC timestamp for when the action was created */
@@ -13,6 +13,7 @@ const propTypes = {
 };
 
 function ReportActionItemDate(props) {
+    const styles = useThemeStyles();
     return <Text style={[styles.chatItemMessageHeaderTimestamp]}>{props.datetimeToCalendarTime(props.created)}</Text>;
 }
 

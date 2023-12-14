@@ -5,10 +5,9 @@ import _ from 'underscore';
 import BlockingView from '@components/BlockingViews/BlockingView';
 import * as Illustrations from '@components/Icon/Illustrations';
 import withLocalize from '@components/withLocalize';
+import useThemeStyles from '@hooks/useThemeStyles';
 import compose from '@libs/compose';
 import Navigation from '@libs/Navigation/Navigation';
-import * as ReportActionsUtils from '@libs/ReportActionsUtils';
-import styles from '@styles/styles';
 import variables from '@styles/variables';
 import ONYXKEYS from '@src/ONYXKEYS';
 import {defaultProps, propTypes} from './attachmentCarouselPropTypes';
@@ -18,7 +17,8 @@ import extractAttachmentsFromReport from './extractAttachmentsFromReport';
 import AttachmentCarouselPager from './Pager';
 import useCarouselArrows from './useCarouselArrows';
 
-function AttachmentCarousel({report, reportActions, source, onNavigate, onClose, setDownloadButtonVisibility, translate}) {
+function AttachmentCarousel({report, reportActions, parentReportActions, source, onNavigate, setDownloadButtonVisibility, translate, onClose}) {
+    const styles = useThemeStyles();
     const pagerRef = useRef(null);
 
     const [containerDimensions, setContainerDimensions] = useState({width: 0, height: 0});
@@ -28,20 +28,11 @@ function AttachmentCarousel({report, reportActions, source, onNavigate, onClose,
     const [isPinchGestureRunning, setIsPinchGestureRunning] = useState(true);
     const [shouldShowArrows, setShouldShowArrows, autoHideArrows, cancelAutoHideArrows] = useCarouselArrows();
 
-    const compareImage = useCallback(
-        (attachment) => {
-            if (attachment.isReceipt) {
-                const action = ReportActionsUtils.getParentReportAction(report);
-                const transactionID = _.get(action, ['originalMessage', 'IOUTransactionID']);
-                return attachment.transactionID === transactionID;
-            }
-            return attachment.source === source;
-        },
-        [source, report],
-    );
+    const compareImage = useCallback((attachment) => attachment.source === source, [source]);
 
     useEffect(() => {
-        const attachmentsFromReport = extractAttachmentsFromReport(report, reportActions);
+        const parentReportAction = parentReportActions[report.parentReportActionID];
+        const attachmentsFromReport = extractAttachmentsFromReport(parentReportAction, reportActions);
 
         const initialPage = _.findIndex(attachmentsFromReport, compareImage);
 
@@ -167,11 +158,19 @@ function AttachmentCarousel({report, reportActions, source, onNavigate, onClose,
 }
 AttachmentCarousel.propTypes = propTypes;
 AttachmentCarousel.defaultProps = defaultProps;
+AttachmentCarousel.displayName = 'AttachmentCarousel';
 
 export default compose(
     withOnyx({
         reportActions: {
             key: ({report}) => `${ONYXKEYS.COLLECTION.REPORT_ACTIONS}${report.reportID}`,
+            canEvict: false,
+        },
+        parentReport: {
+            key: ({report}) => `${ONYXKEYS.COLLECTION.REPORT}${report ? report.parentReportID : '0'}`,
+        },
+        parentReportActions: {
+            key: ({report}) => `${ONYXKEYS.COLLECTION.REPORT_ACTIONS}${report ? report.parentReportID : '0'}`,
             canEvict: false,
         },
     }),
