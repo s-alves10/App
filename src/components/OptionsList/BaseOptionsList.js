@@ -268,7 +268,7 @@ function BaseOptionsList({
                     if (sections[idx].data.length === 0) {
                         sectionIndex ++;
                     } else {
-                        flatDataArrayIndex += sections[idx].data.length;
+                        flatDataArrayIndex += (sections[idx].data.length + 2);
                     }
                 }
 
