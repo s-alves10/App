@@ -1,6 +1,8 @@
 import PropTypes from 'prop-types';
-import React, {useCallback, useImperativeHandle, useRef} from 'react';
+import React, {useCallback, useContext, useEffect, useImperativeHandle, useRef} from 'react';
 import {View} from 'react-native';
+import {DragAndDropContext} from '@components/DragAndDrop/Provider';
+import usePrevious from '@hooks/usePrevious';
 import SuggestionEmoji from './SuggestionEmoji';
 import SuggestionMention from './SuggestionMention';
 import * as SuggestionProps from './suggestionProps';
@@ -46,6 +48,8 @@ function Suggestions({
 }) {
     const suggestionEmojiRef = useRef(null);
     const suggestionMentionRef = useRef(null);
+    const {isDraggingOver} = useContext(DragAndDropContext);
+    const prevIsDraggingOver = usePrevious(isDraggingOver);
 
     const getSuggestions = useCallback(() => {
         if (suggestionEmojiRef.current && suggestionEmojiRef.current.getSuggestions) {
@@ -111,6 +115,13 @@ function Suggestions({
         }),
         [onSelectionChange, resetSuggestions, setShouldBlockSuggestionCalc, triggerHotkeyActions, updateShouldShowSuggestionMenuToFalse, getSuggestions],
     );
+
+    useEffect(() => {
+        if (!(!prevIsDraggingOver && isDraggingOver)) {
+            return;
+        }
+        updateShouldShowSuggestionMenuToFalse();
+    }, [isDraggingOver, prevIsDraggingOver, updateShouldShowSuggestionMenuToFalse]);
 
     const baseProps = {
         value,

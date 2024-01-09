@@ -1,18 +1,21 @@
 import {useIsFocused} from '@react-navigation/native';
-import React, {ForwardedRef, useCallback} from 'react';
-import {ActivityIndicator, GestureResponderEvent, StyleProp, TextStyle, View, ViewStyle} from 'react-native';
-import {SvgProps} from 'react-native-svg';
+import type {ForwardedRef} from 'react';
+import React, {useCallback} from 'react';
+import type {GestureResponderEvent, StyleProp, TextStyle, ViewStyle} from 'react-native';
+import {ActivityIndicator, View} from 'react-native';
 import Icon from '@components/Icon';
 import * as Expensicons from '@components/Icon/Expensicons';
 import PressableWithFeedback from '@components/Pressable/PressableWithFeedback';
 import Text from '@components/Text';
 import withNavigationFallback from '@components/withNavigationFallback';
+import useActiveElement from '@hooks/useActiveElement';
 import useKeyboardShortcut from '@hooks/useKeyboardShortcut';
+import useTheme from '@hooks/useTheme';
+import useThemeStyles from '@hooks/useThemeStyles';
 import HapticFeedback from '@libs/HapticFeedback';
-import useTheme from '@styles/themes/useTheme';
-import useThemeStyles from '@styles/useThemeStyles';
 import CONST from '@src/CONST';
-import ChildrenProps from '@src/types/utils/ChildrenProps';
+import type ChildrenProps from '@src/types/utils/ChildrenProps';
+import type IconAsset from '@src/types/utils/IconAsset';
 import validateSubmitShortcut from './validateSubmitShortcut';
 
 type ButtonWithText = {
@@ -23,7 +26,7 @@ type ButtonWithText = {
     shouldShowRightIcon?: boolean;
 
     /** The icon asset to display to the left of the text */
-    icon?: React.FC<SvgProps> | null;
+    icon?: IconAsset | null;
 };
 
 type ButtonProps = (ButtonWithText | ChildrenProps) & {
@@ -31,7 +34,7 @@ type ButtonProps = (ButtonWithText | ChildrenProps) & {
     allowBubble?: boolean;
 
     /** The icon asset to display to the right of the text */
-    iconRight?: React.FC<SvgProps>;
+    iconRight?: IconAsset;
 
     /** The fill color to pass into the icon. */
     iconFill?: string;
@@ -64,13 +67,13 @@ type ButtonProps = (ButtonWithText | ChildrenProps) & {
     onLongPress?: (event?: GestureResponderEvent) => void;
 
     /** A function that is called when the button is pressed */
-    onPressIn?: () => void;
+    onPressIn?: (event: GestureResponderEvent) => void;
 
     /** A function that is called when the button is released */
-    onPressOut?: () => void;
+    onPressOut?: (event: GestureResponderEvent) => void;
 
     /** Callback that is called when mousedown is triggered. */
-    onMouseDown?: () => void;
+    onMouseDown?: (e: React.MouseEvent<Element, MouseEvent>) => void;
 
     /** Call the onPress function when Enter key is pressed */
     pressOnEnter?: boolean;
@@ -104,6 +107,9 @@ type ButtonProps = (ButtonWithText | ChildrenProps) & {
 
     /** Should enable the haptic feedback? */
     shouldEnableHapticFeedback?: boolean;
+
+    /** Should disable the long press? */
+    isLongPressDisabled?: boolean;
 
     /** Id to use for this button */
     id?: string;
@@ -148,6 +154,7 @@ function Button(
         shouldRemoveRightBorderRadius = false,
         shouldRemoveLeftBorderRadius = false,
         shouldEnableHapticFeedback = false,
+        isLongPressDisabled = false,
 
         id = '',
         accessibilityLabel = '',
@@ -158,19 +165,22 @@ function Button(
     const theme = useTheme();
     const styles = useThemeStyles();
     const isFocused = useIsFocused();
+    const activeElement = useActiveElement();
+    const accessibilityRoles: string[] = Object.values(CONST.ACCESSIBILITY_ROLE);
+    const shouldDisableEnterShortcut = accessibilityRoles.includes(activeElement?.role ?? '') && activeElement?.role !== CONST.ACCESSIBILITY_ROLE.TEXT;
 
     const keyboardShortcutCallback = useCallback(
         (event?: GestureResponderEvent | KeyboardEvent) => {
-            if (!validateSubmitShortcut(isFocused, isDisabled, isLoading, event)) {
+            if (!validateSubmitShortcut(isDisabled, isLoading, event)) {
                 return;
             }
             onPress();
         },
-        [isDisabled, isFocused, isLoading, onPress],
+        [isDisabled, isLoading, onPress],
     );
 
     useKeyboardShortcut(CONST.KEYBOARD_SHORTCUTS.ENTER, keyboardShortcutCallback, {
-        isActive: pressOnEnter,
+        isActive: pressOnEnter && !shouldDisableEnterShortcut && isFocused,
         shouldBubble: allowBubble,
         priority: enterKeyEventListenerPriority,
         shouldPreventDefault: false,
@@ -195,7 +205,7 @@ function Button(
                     large && styles.buttonLargeText,
                     success && styles.buttonSuccessText,
                     danger && styles.buttonDangerText,
-                    icon && styles.textAlignLeft,
+                    Boolean(icon) && styles.textAlignLeft,
                     textStyles,
                 ]}
                 dataSet={{[CONST.SELECTION_SCRAPER_HIDDEN_ELEMENT]: true}}
@@ -213,7 +223,7 @@ function Button(
                             <View style={[styles.mr1, iconStyles]}>
                                 <Icon
                                     src={icon}
-                                    fill={iconFill ?? theme.textLight}
+                                    fill={iconFill ?? (success || danger ? theme.textLight : theme.icon)}
                                     small={small}
                                 />
                             </View>
@@ -224,7 +234,7 @@ function Button(
                         <View style={[styles.justifyContentCenter, styles.ml1, iconRightStyles]}>
                             <Icon
                                 src={iconRight}
-                                fill={iconFill ?? theme.textLight}
+                                fill={iconFill ?? (success || danger ? theme.textLight : theme.icon)}
                                 small={small}
                             />
                         </View>
@@ -251,6 +261,9 @@ function Button(
                 return onPress(event);
             }}
             onLongPress={(event) => {
+                if (isLongPressDisabled) {
+                    return;
+                }
                 if (shouldEnableHapticFeedback) {
                     HapticFeedback.longPress();
                 }
@@ -289,7 +302,7 @@ function Button(
             ]}
             id={id}
             accessibilityLabel={accessibilityLabel}
-            role={CONST.ACCESSIBILITY_ROLE.BUTTON}
+            role={CONST.ROLE.BUTTON}
             hoverDimmingValue={1}
         >
             {renderContent()}

@@ -1,11 +1,11 @@
-import React, {ReactElement, useCallback} from 'react';
+import type {ReactElement} from 'react';
+import React, {useCallback} from 'react';
 import {View} from 'react-native';
-import type {SimpleEmoji} from '@libs/EmojiTrie';
+import type {Emoji} from '@assets/emojis/types';
+import useStyleUtils from '@hooks/useStyleUtils';
+import useThemeStyles from '@hooks/useThemeStyles';
 import * as EmojiUtils from '@libs/EmojiUtils';
 import getStyledTextArray from '@libs/GetStyledTextArray';
-import * as StyleUtils from '@styles/StyleUtils';
-import useTheme from '@styles/themes/useTheme';
-import useThemeStyles from '@styles/useThemeStyles';
 import AutoCompleteSuggestions from './AutoCompleteSuggestions';
 import Text from './Text';
 
@@ -16,7 +16,7 @@ type EmojiSuggestionsProps = {
     highlightedEmojiIndex?: number;
 
     /** Array of suggested emoji */
-    emojis: SimpleEmoji[];
+    emojis: Emoji[];
 
     /** Fired when the user selects an emoji */
     onSelect: (index: number) => void;
@@ -43,16 +43,16 @@ type EmojiSuggestionsProps = {
 /**
  * Create unique keys for each emoji item
  */
-const keyExtractor = (item: SimpleEmoji, index: number): string => `${item.name}+${index}}`;
+const keyExtractor = (item: Emoji, index: number): string => `${item.name}+${index}}`;
 
 function EmojiSuggestions({emojis, onSelect, onClose, prefix, isEmojiPickerLarge, preferredSkinToneIndex, highlightedEmojiIndex = 0, measureParentContainer = () => {}}: EmojiSuggestionsProps) {
     const styles = useThemeStyles();
-    const theme = useTheme();
+    const StyleUtils = useStyleUtils();
     /**
      * Render an emoji suggestion menu item component.
      */
     const renderSuggestionMenuItem = useCallback(
-        (item: SimpleEmoji): ReactElement => {
+        (item: Emoji): ReactElement => {
             const styledTextArray = getStyledTextArray(item.name, prefix);
 
             return (
@@ -66,7 +66,7 @@ function EmojiSuggestions({emojis, onSelect, onClose, prefix, isEmojiPickerLarge
                         {styledTextArray.map(({text, isColored}) => (
                             <Text
                                 key={`${text}+${isColored}`}
-                                style={StyleUtils.getColoredBackgroundStyle(theme, isColored)}
+                                style={StyleUtils.getColoredBackgroundStyle(isColored)}
                             >
                                 {text}
                             </Text>
@@ -76,7 +76,7 @@ function EmojiSuggestions({emojis, onSelect, onClose, prefix, isEmojiPickerLarge
                 </View>
             );
         },
-        [styles, theme, prefix, preferredSkinToneIndex],
+        [prefix, styles.autoCompleteSuggestionContainer, styles.emojiSuggestionsEmoji, styles.emojiSuggestionsText, preferredSkinToneIndex, StyleUtils],
     );
 
     return (
