@@ -55,7 +55,7 @@ export default [
         isAnonymousAction: false,
         shouldKeepOpen: true,
         shouldShow: (type, reportAction) => type === CONST.CONTEXT_MENU_TYPES.REPORT_ACTION && _.has(reportAction, 'message') && !ReportActionsUtils.isMessageDeleted(reportAction),
-        renderContent: (closePopover, {reportID, reportAction, close: closeManually, openContextMenu, anchorPosition}) => {
+        renderContent: (closePopover, {reportID, reportAction, close: closeManually, openContextMenu, anchorPosition, onHideEmojiPicker}) => {
             const isMini = !closePopover;
 
             const closeContextMenu = (onHideCallback) => {
@@ -90,8 +90,9 @@ export default [
             return (
                 <QuickEmojiReactions
                     key="BaseQuickEmojiReactions"
-                    closeContextMenu={closeContextMenu}
+                    closeContextMenu={(onHideCallback) => hideContextMenu(false, onHideCallback, false)}
                     onEmojiSelected={toggleEmojiAndCloseMenu}
+                    onHideEmojiPicker={onHideEmojiPicker}
                     reportActionID={reportAction.reportActionID}
                     reportAction={reportAction}
                     anchorPosition={anchorPosition}

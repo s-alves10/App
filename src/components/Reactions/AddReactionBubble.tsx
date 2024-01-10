@@ -36,6 +36,11 @@ type AddReactionBubbleProps = {
     onWillShowPicker?: (callback: CloseContextMenuCallback) => void;
 
     /**
+     * Will get called when the picker hides
+     */
+    onHidePicker?: () => void;
+
+    /**
      * Called when the user selects an emoji.
      */
     onSelectEmoji: (emoji: Emoji) => void;
@@ -51,7 +56,15 @@ type AddReactionBubbleProps = {
     anchorPosition?: AnchorPosition;
 };
 
-function AddReactionBubble({onSelectEmoji, reportAction, onPressOpenPicker, anchorPosition = undefined, onWillShowPicker = () => {}, isContextMenu = false}: AddReactionBubbleProps) {
+function AddReactionBubble({
+    onSelectEmoji,
+    reportAction,
+    onPressOpenPicker,
+    anchorPosition = undefined,
+    onWillShowPicker = () => {},
+    onHidePicker = () => {},
+    isContextMenu = false,
+}: AddReactionBubbleProps) {
     const styles = useThemeStyles();
     const StyleUtils = useStyleUtils();
     const ref = useRef<View | HTMLDivElement>(null);
@@ -62,7 +75,7 @@ function AddReactionBubble({onSelectEmoji, reportAction, onPressOpenPicker, anch
     const onPress = () => {
         const openPicker = (refParam?: PickerRefElement, anchorOrigin?: AnchorOrigin) => {
             EmojiPickerAction.showEmojiPicker(
-                () => {},
+                onHidePicker,
                 (emojiCode, emojiObject) => {
                     onSelectEmoji(emojiObject);
                 },

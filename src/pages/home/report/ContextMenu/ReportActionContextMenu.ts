@@ -33,7 +33,7 @@ type ShowContextMenu = (
 
 type ReportActionContextMenu = {
     showContextMenu: ShowContextMenu;
-    hideContextMenu: (callback: OnHideCallback) => void;
+    hideContextMenu: (callback: OnHideCallback, shouldResetHideCallback: boolean) => void;
     showDeleteModal: (reportID: string, reportAction: OnyxEntry<ReportAction>, shouldSetModalVisibility?: boolean, onConfirm?: OnConfirm, onCancel?: OnCancel) => void;
     hideDeleteModal: () => void;
     isActiveReportAction: (accountID: string | number) => boolean;
@@ -51,12 +51,12 @@ const contextMenuRef = React.createRef<ReportActionContextMenu>();
  * @param [shouldDelay] - whether the menu should close after a delay
  * @param [onHideCallback] - Callback to be called after Context Menu is completely hidden
  */
-function hideContextMenu(shouldDelay?: boolean, onHideCallback = () => {}) {
+function hideContextMenu(shouldDelay?: boolean, onHideCallback = () => {}, shouldResetHideCallback = true) {
     if (!contextMenuRef.current) {
         return;
     }
     if (!shouldDelay) {
-        contextMenuRef.current.hideContextMenu(onHideCallback);
+        contextMenuRef.current.hideContextMenu(onHideCallback, shouldResetHideCallback);
 
         return;
     }
@@ -70,7 +70,7 @@ function hideContextMenu(shouldDelay?: boolean, onHideCallback = () => {}) {
             return;
         }
 
-        contextMenuRef.current.hideContextMenu(onHideCallback);
+        contextMenuRef.current.hideContextMenu(onHideCallback, shouldResetHideCallback);
     }, 800);
 }
 

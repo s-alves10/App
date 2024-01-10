@@ -33,6 +33,11 @@ type BaseQuickEmojiReactionsProps = BaseQuickEmojiReactionsOnyxProps & {
     onWillShowPicker?: (callback: CloseContextMenuCallback) => void;
 
     /**
+     * Will be called when the picker hides
+     */
+    onHideEmojiPicker?: () => void;
+
+    /**
      * Callback to fire when the "open emoji picker" button is pressed.
      * The function receives an argument which can be called
      * to actually open the emoji picker.

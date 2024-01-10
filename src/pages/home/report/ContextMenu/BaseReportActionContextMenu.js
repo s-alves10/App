@@ -39,6 +39,8 @@ const propTypes = {
     /** Whether the provided report is an archived room */
     isArchivedRoom: PropTypes.bool,
 
+    onHideEmojiPicker: PropTypes.func,
+
     contentRef: PropTypes.oneOfType([PropTypes.node, PropTypes.object, PropTypes.func]),
 
     ...genericReportActionContextMenuPropTypes,
@@ -148,6 +150,7 @@ function BaseReportActionContextMenu(props) {
                         draftMessage: props.draftMessage,
                         selection: props.selection,
                         anchorPosition: props.anchorPosition,
+                        onHideEmojiPicker: props.onHideEmojiPicker,
                         close: () => setShouldKeepOpen(false),
                         openContextMenu: () => setShouldKeepOpen(true),
                         interceptAnonymousUser,

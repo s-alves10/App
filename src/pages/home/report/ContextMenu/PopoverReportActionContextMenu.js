@@ -49,6 +49,7 @@ function PopoverReportActionContextMenu(_props, ref) {
 
     const onPopoverShow = useRef(() => {});
     const onPopoverHide = useRef(() => {});
+    const shouldResetHideCallbackRef = useRef(true);
     const onCancelDeleteModal = useRef(() => {});
     const onComfirmDeleteModal = useRef(() => {});
 
@@ -159,6 +160,7 @@ function PopoverReportActionContextMenu(_props, ref) {
 
         onPopoverShow.current = onShow;
         onPopoverHide.current = onHide;
+        shouldResetHideCallbackRef.current = true;
 
         getContextMenuMeasuredLocation().then(({x, y}) => {
             popoverAnchorPosition.current = {
@@ -212,19 +214,23 @@ function PopoverReportActionContextMenu(_props, ref) {
         reportActionIDRef.current = '0';
         originalReportIDRef.current = '0';
 
-        onPopoverHide.current = runAndResetCallback(onPopoverHide.current);
+        if (shouldResetHideCallbackRef.current) {
+            onPopoverHide.current = runAndResetCallback(onPopoverHide.current);
+        }
         onPopoverHideActionCallback.current = runAndResetCallback(onPopoverHideActionCallback.current);
     };
 
     /**
      * Hide the ReportActionContextMenu modal popover.
      * @param {Function} onHideActionCallback Callback to be called after popover is completely hidden
+     * @param {Boolean} shouldResetHideCallback Whether should call and reset onHide callback when context menu hides
      */
-    const hideContextMenu = (onHideActionCallback) => {
+    const hideContextMenu = (onHideActionCallback, shouldResetHideCallback = true) => {
         if (_.isFunction(onHideActionCallback)) {
             onPopoverHideActionCallback.current = onHideActionCallback;
         }
 
+        shouldResetHideCallbackRef.current = shouldResetHideCallback;
         selectionRef.current = '';
         reportActionDraftMessageRef.current = undefined;
         setIsPopoverVisible(false);
@@ -314,6 +320,9 @@ function PopoverReportActionContextMenu(_props, ref) {
                     contentRef={contentRef}
                     originalReportID={originalReportIDRef.current}
                     anchorPosition={popoverAnchorPosition.current}
+                    onHideEmojiPicker={() => {
+                        onPopoverHide.current = runAndResetCallback(onPopoverHide.current);
+                    }}
                 />
             </PopoverWithMeasuredContent>
             <ConfirmModal
