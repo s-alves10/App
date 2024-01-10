@@ -5,6 +5,7 @@ import type {ValueOf} from 'type-fest';
 import type {Emoji} from '@assets/emojis/types';
 import type {CloseContextMenuCallback} from '@components/Reactions/QuickEmojiReactions/types';
 import type CONST from '@src/CONST';
+import type {AnchorPosition} from '@src/styles';
 
 type AnchorOrigin = {
     horizontal: ValueOf<typeof CONST.MODAL.ANCHOR_ORIGIN_HORIZONTAL>;
@@ -24,6 +25,7 @@ type EmojiPickerRef = {
         onEmojiSelectedValue: OnEmojiSelected,
         emojiPopoverAnchor: EmojiPopoverAnchor,
         anchorOrigin?: AnchorOrigin,
+        anchorPosition?: AnchorPosition,
         onWillShow?: OnWillShowPicker,
         id?: string,
     ) => void;
@@ -53,6 +55,7 @@ function showEmojiPicker(
     onEmojiSelected: OnEmojiSelected,
     emojiPopoverAnchor: EmojiPopoverAnchor,
     anchorOrigin?: AnchorOrigin,
+    anchorPosition?: AnchorPosition,
     onWillShow: OnWillShowPicker = () => {},
     id?: string,
 ) {
@@ -60,7 +63,7 @@ function showEmojiPicker(
         return;
     }
 
-    emojiPickerRef.current.showEmojiPicker(onModalHide, onEmojiSelected, emojiPopoverAnchor, anchorOrigin, onWillShow, id);
+    emojiPickerRef.current.showEmojiPicker(onModalHide, onEmojiSelected, emojiPopoverAnchor, anchorOrigin, anchorPosition, onWillShow, id);
 }
 
 /**

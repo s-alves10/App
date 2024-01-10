@@ -3,6 +3,7 @@ import type {TextInput, View} from 'react-native';
 import type {OnyxEntry} from 'react-native-onyx';
 import type {Emoji} from '@assets/emojis/types';
 import type {AnchorOrigin} from '@userActions/EmojiPickerAction';
+import type {AnchorPosition} from '@src/styles';
 import type {Locale, ReportAction, ReportActionReactions} from '@src/types/onyx';
 
 type PickerRefElement = RefObject<TextInput | View>;
@@ -43,6 +44,9 @@ type BaseQuickEmojiReactionsProps = BaseQuickEmojiReactionsOnyxProps & {
 
     /** Id of the ReportAction for EmojiPicker. */
     reportActionID: string;
+
+    /** Anchor position of EmojiPicker */
+    anchorPosition?: AnchorPosition;
 };
 
 type QuickEmojiReactionsProps = BaseQuickEmojiReactionsProps & {

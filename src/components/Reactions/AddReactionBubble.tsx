@@ -15,6 +15,7 @@ import * as EmojiPickerAction from '@userActions/EmojiPickerAction';
 import type {AnchorOrigin} from '@userActions/EmojiPickerAction';
 import * as Session from '@userActions/Session';
 import CONST from '@src/CONST';
+import type {AnchorPosition} from '@src/styles';
 import type {ReportAction} from '@src/types/onyx';
 import type {CloseContextMenuCallback, OpenPickerCallback, PickerRefElement} from './QuickEmojiReactions/types';
 
@@ -43,9 +44,14 @@ type AddReactionBubbleProps = {
      * ReportAction for EmojiPicker.
      */
     reportAction: ReportAction;
+
+    /**
+     * Anchor position of EmojiPicker
+     */
+    anchorPosition?: AnchorPosition;
 };
 
-function AddReactionBubble({onSelectEmoji, reportAction, onPressOpenPicker, onWillShowPicker = () => {}, isContextMenu = false}: AddReactionBubbleProps) {
+function AddReactionBubble({onSelectEmoji, reportAction, onPressOpenPicker, anchorPosition = undefined, onWillShowPicker = () => {}, isContextMenu = false}: AddReactionBubbleProps) {
     const styles = useThemeStyles();
     const StyleUtils = useStyleUtils();
     const ref = useRef<View | HTMLDivElement>(null);
@@ -62,6 +68,7 @@ function AddReactionBubble({onSelectEmoji, reportAction, onPressOpenPicker, onWi
                 },
                 refParam ?? ref,
                 anchorOrigin,
+                anchorPosition,
                 onWillShowPicker,
                 reportAction.reportActionID,
             );

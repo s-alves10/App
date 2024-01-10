@@ -64,6 +64,7 @@ function MiniQuickEmojiReactions({
             },
             ref,
             undefined,
+            undefined,
             () => {},
             reportAction.reportActionID,
         );

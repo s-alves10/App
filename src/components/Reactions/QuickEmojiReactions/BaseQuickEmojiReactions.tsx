@@ -20,6 +20,7 @@ function BaseQuickEmojiReactions({
     emojiReactions = {},
     onPressOpenPicker = () => {},
     onWillShowPicker = () => {},
+    anchorPosition = undefined,
 }: BaseQuickEmojiReactionsProps) {
     const styles = useThemeStyles();
 
@@ -41,6 +42,7 @@ function BaseQuickEmojiReactions({
             ))}
             <AddReactionBubble
                 isContextMenu
+                anchorPosition={anchorPosition}
                 onPressOpenPicker={onPressOpenPicker}
                 onWillShowPicker={onWillShowPicker}
                 onSelectEmoji={(emoji) => onEmojiSelected(emoji, emojiReactions)}

@@ -27,6 +27,12 @@ const propTypes = {
     /** Target node which is the target of ContentMenu */
     anchor: PropTypes.oneOfType([PropTypes.node, PropTypes.object]),
 
+    /** Anchor position of the ContextMenu */
+    anchorPosition: PropTypes.shape({
+        horizontal: PropTypes.number,
+        vertical: PropTypes.number,
+    }),
+
     /** Flag to check if the chat participant is Chronos */
     isChronosReport: PropTypes.bool,
 
@@ -43,6 +49,7 @@ const propTypes = {
 const defaultProps = {
     type: CONST.CONTEXT_MENU_TYPES.REPORT_ACTION,
     anchor: null,
+    anchorPosition: null,
     contentRef: null,
     isChronosReport: false,
     isArchivedRoom: false,
@@ -140,6 +147,7 @@ function BaseReportActionContextMenu(props) {
                         reportID: props.reportID,
                         draftMessage: props.draftMessage,
                         selection: props.selection,
+                        anchorPosition: props.anchorPosition,
                         close: () => setShouldKeepOpen(false),
                         openContextMenu: () => setShouldKeepOpen(true),
                         interceptAnonymousUser,

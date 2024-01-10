@@ -53,10 +53,11 @@ const EmojiPicker = forwardRef((props, ref) => {
      * @param {Function} [onEmojiSelectedValue=() => {}] - Run a callback when Emoji selected.
      * @param {React.MutableRefObject} emojiPopoverAnchorValue - Element to which Popover is anchored
      * @param {Object} [anchorOrigin=DEFAULT_ANCHOR_ORIGIN] - Anchor origin for Popover
+     * @param {Object} [anchorPosition=undefined] - Anchor position for Popover
      * @param {Function} [onWillShow=() => {}] - Run a callback when Popover will show
      * @param {String} id - Unique id for EmojiPicker
      */
-    const showEmojiPicker = (onModalHideValue, onEmojiSelectedValue, emojiPopoverAnchorValue, anchorOrigin, onWillShow = () => {}, id) => {
+    const showEmojiPicker = (onModalHideValue, onEmojiSelectedValue, emojiPopoverAnchorValue, anchorOrigin, anchorPosition, onWillShow = () => {}, id) => {
         onModalHide.current = onModalHideValue;
         onEmojiSelected.current = onEmojiSelectedValue;
         emojiPopoverAnchorRef.current = emojiPopoverAnchorValue;
@@ -68,13 +69,24 @@ const EmojiPicker = forwardRef((props, ref) => {
 
         const anchorOriginValue = anchorOrigin || DEFAULT_ANCHOR_ORIGIN;
 
-        calculateAnchorPosition(emojiPopoverAnchor.current, anchorOriginValue).then((value) => {
-            onWillShow();
+        if (anchorPosition) {
             setIsEmojiPickerVisible(true);
-            setEmojiPopoverAnchorPosition(value);
-            setEmojiPopoverAnchorOrigin(anchorOriginValue);
+            onWillShow();
+            setEmojiPopoverAnchorPosition(anchorPosition);
+            setEmojiPopoverAnchorOrigin({
+                horizontal: CONST.MODAL.ANCHOR_ORIGIN_HORIZONTAL.LEFT,
+                vertical: CONST.MODAL.ANCHOR_ORIGIN_VERTICAL.BOTTOM,
+            });
             setActiveID(id);
-        });
+        } else {
+            calculateAnchorPosition(emojiPopoverAnchor.current, anchorOriginValue).then((value) => {
+                setIsEmojiPickerVisible(true);
+                onWillShow();
+                setEmojiPopoverAnchorPosition(value);
+                setEmojiPopoverAnchorOrigin(anchorOriginValue);
+                setActiveID(id);
+            });
+        }
     };
 
     /**

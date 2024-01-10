@@ -313,6 +313,7 @@ function PopoverReportActionContextMenu(_props, ref) {
                     anchor={contextMenuTargetNode}
                     contentRef={contentRef}
                     originalReportID={originalReportIDRef.current}
+                    anchorPosition={popoverAnchorPosition.current}
                 />
             </PopoverWithMeasuredContent>
             <ConfirmModal
